@@ -33,21 +33,21 @@ class CorrePocoyo{
 	/*
 	 * Agrega un nuevo corredor al CorrePocoyo. Lo agregará al final 
 	 */
-	void nuevoCorredor(const T&);
+	void nuevoCorredor(const T& c);
 	
 	/*
 	 * Agrega un nuevo corredor al CorrePocoyo. El primer T es el corredor a agregar y lo hace delante del segundo
 	 *
 	 * PRE: Existe el segundo corredor 
 	 */
-	void nuevoCorredor(const T&, const T&);
+	void nuevoCorredor(const T& c, const T& a);
 	
 	/*
 	 * Elimina del pocoyo al que se envía
 	 *
 	 * PRE: Existe el corredor
 	 */
-	void seCansa(const T&);
+	void seCansa(const T& c);
 	/*
 	 * El corredor pasa al que está adelante 
 	 *
@@ -175,20 +175,48 @@ CorrePocoyo<T>::~CorrePocoyo() {
 }
 
 template<class T>
-void CorrePocoyo<T>::nuevoCorredor(const T&) {
-	Nodo* = new Nodo();
-	
-
-
+void CorrePocoyo<T>::nuevoCorredor(const T& c) {
+	Nodo* n = new Nodo();
+	n -> dato = new T(c);
+	//referencio n
+	n -> sig = ultimo;
+	n -> ant = NULL;
+	//referencio ultimo
+	ultimo -> ant = n;
+	length++;
 }
 
 template<class T>
-void CorrePocoyo<T>::nuevoCorredor(const T&, const T&) {
-
+void CorrePocoyo<T>::nuevoCorredor(const T& c, const T& a) {
+	Nodo* n = new Nodo();
+	n -> dato = new T(c);
+	//referencio n
+	n -> sig = a -> sig;
+	n -> ant = a;
+	//dereferencio a
+	a -> sig = n;
+	//dereferencio al siguiente de a
+	(a -> sig) -> ant = n;
+	length++;
 }
 
 template<class T>
-void CorrePocoyo<T>::seCansa(const T&) {
+void CorrePocoyo<T>::seCansa(const T& c) {
+	if(length == 1)	{
+		delete primero -> dato;
+		delete primero;
+		length = 0;
+		primero = NULL;
+		ultimo = NULL;
+		filmado = NULL;
+	}
+	else	{
+	Nodo* corredor = ultimo;
+	Nodo* sCorredor = NULL;
+	while(*(corredor -> dato) != c) {
+		
+		}
+	}
 
 }
 
