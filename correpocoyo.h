@@ -165,7 +165,7 @@ CorrePocoyo<T>::CorrePocoyo() {
 }
 
 template<class T>
-CorrePocoyo<T>::CorrePocoyo(const CorrePocoyo<T>&) {
+CorrePocoyo<T>::CorrePocoyo(const CorrePocoyo<T>& otro) {
 	length = 0;
 	primero = NULL;
 	ultimo = NULL;
@@ -176,7 +176,7 @@ CorrePocoyo<T>::CorrePocoyo(const CorrePocoyo<T>&) {
 		ultimo -> dato = new T(*(otro.ultimo -> dato));
 		ultimo -> ant = NULL;
 		ultimo -> sig = NULL;
-		if (otro.filmado = otro.ultimo) {filmado = ultimo;}
+		if (otro.filmado == otro.ultimo) {filmado = ultimo;}
 
 		Nodo* anterior = ultimo;
 		Nodo* corredor = otro.ultimo -> sig;
@@ -214,24 +214,49 @@ void CorrePocoyo<T>::nuevoCorredor(const T& c) {
 	Nodo* n = new Nodo();
 	n -> dato = new T(c);
 	//referencio n
-	n -> sig = ultimo;
 	n -> ant = NULL;
-	//referencio ultimo
-	ultimo -> ant = n;
+	// si existe ultimo, lo referencio
+	if (ultimo != NULL) {
+		ultimo -> ant = n;
+		n -> sig = ultimo;
+	}
+	else {n -> sig = NULL;}
+	ultimo = n;
+	if(primero == NULL) {primero = n;}
+	if(filmado == NULL) {filmado = n;}
 	length++;
 }
 
 template<class T>
 void CorrePocoyo<T>::nuevoCorredor(const T& c, const T& a) {
+	assert(length > 0);
 	Nodo* n = new Nodo();
 	n -> dato = new T(c);
-	//referencio n
-	n -> sig = a -> sig;
-	n -> ant = a;
-	//dereferencio a
-	a -> sig = n;
-	//dereferencio al siguiente de a
-	(a -> sig) -> ant = n;
+	//busco al corredor a
+	Nodo* corredor = ultimo;
+	Nodo* sigCorredor = NULL;
+	while (*(corredor -> dato) != a) {
+		sigCorredor = corredor -> sig;
+		corredor = sigCorredor;
+	}
+	if (*(corredor -> dato) == *(primero -> dato)) {
+		//referencio a n 
+		n -> sig = NULL;
+		n -> ant = corredor;
+		//referencio a corredor
+		corredor -> sig = n;
+	}
+	else {
+		sigCorredor = corredor -> sig;
+		//referencio a n 
+		n -> sig = sigCorredor;
+		n -> ant = corredor;
+		//referencio a sigCorredor
+		sigCorredor -> ant = n;
+		//referencio a corredor
+		corredor -> sig = n;
+	}
+	if(*(primero -> dato) == *(corredor -> dato)) {primero = n;}
 	length++;
 }
 
@@ -343,7 +368,7 @@ const T& CorrePocoyo<T>::damePrimero() const {
 
 template<class T>
 int CorrePocoyo<T>::damePosicion(const T& c) const {
-	int j = 1
+	int j = 1;
 	Nodo* corredor = primero;
 	while (*(corredor -> dato) != c) {
 		corredor = corredor -> ant;
@@ -353,7 +378,7 @@ int CorrePocoyo<T>::damePosicion(const T& c) const {
 }
 
 template<class T>
-const T& CorrePocoyo<T>::dameCorredorEnPos(int) const {
+const T& CorrePocoyo<T>::dameCorredorEnPos(int i) const {
 	int j = 1;
 	Nodo* corredor = primero;
 	while(j != i) {
@@ -378,14 +403,14 @@ int CorrePocoyo<T>::tamanio() const {
 template<class T>
 bool CorrePocoyo<T>::operator==(const CorrePocoyo<T>& otro) const {
 	if(esVacia() && otro.esVacia()) { return true; }
-	else if (esvacia() || otro.esVacia()) {return false;}
+	else if (esVacia() || otro.esVacia()) {return false;}
 	else {
 		//chequeo largo, primero y ultimo
 		if (length != otro.length || *(primero -> dato) != *(otro.primero -> dato) || *(ultimo -> dato) != *(otro.ultimo -> dato)) {
 			return false;
 		}
 		//chequeo filmado
-		if (filmado != NULL && otro.filmado != NULL && *(filmado -> dato) != *(otro.filmado -> dato) || filmado != NULL && otro.filmado == NULL || filmado == NULL && otro.filmado != NULL) {
+		if ((filmado != NULL && otro.filmado != NULL && *(filmado -> dato) != *(otro.filmado -> dato)) || (filmado != NULL && otro.filmado == NULL) || (filmado == NULL && otro.filmado != NULL)) {
 			return false;
 		}
 		// chequeo todos los corredores
@@ -403,31 +428,32 @@ bool CorrePocoyo<T>::operator==(const CorrePocoyo<T>& otro) const {
 }
 
 template<class T>
-ostream& CorrePocoyo<T>::mostrarCorrePocoyo(ostream&) const {
+ostream& CorrePocoyo<T>::mostrarCorrePocoyo(ostream& os) const {
 	os << "[";
 		if(!esVacia()) {
-			Nodo* corredor = ultimo;
+			Nodo* corredor = primero;
 			while(corredor != NULL)	{
-				//el corredor es filmado y no es primero
-				if(*(corredor -> dato) == *(filmado -> dato) && *(corredor -> dato) != *(primero -> dato)) {
-					os << "FILMADO(" << *(corredor -> dato) << "), ";
+				//el corredor es filmado y no es ultimo
+				//if(*(corredor -> dato) == *(filmado -> dato) && *(corredor -> dato) != *(ultimo -> dato)) {
+				//	os << "FILMADO(" << *(corredor -> dato) << "), ";
+				//}
+				//el corredor es filmado y es ultimo
+				//else if(*(corredor -> dato) == *(filmado -> dato) && *(corredor -> dato) == *(ultimo -> dato)) {
+				//	os << "FILMADO(" << *(corredor -> dato);
+				//}
+				//el corredor no es filmado y es ultimo
+				if (*(corredor -> dato) == *(ultimo -> dato)) {
+					os << *(corredor -> dato);
 				}
-				//el corredor es filmado y es primero
-				else if(*(corredor -> dato) == *(filmado -> dato) && *(corredor -> dato) == *(primero -> dato)) {
-					os << "FILMADO(" << *(corredor -> dato) << "";
-				}
-				//el corredor no es filmado y es primero
-				else if (*(corredor -> dato) == *(primero -> dato)) {
-					os << *(corredor -> dato) << "";
-				}
-				//el corredor no es filmado y no es primero
+				//el corredor no es filmado y no es ultimo
 				else {
 					os << *(corredor -> dato) << ", ";
 				}
-				corredor = corredor -> sig;
+				corredor = corredor -> ant;
 			}
 		}
 	os << "]";
+	return os;
 }
 
 
