@@ -217,9 +217,8 @@ void CorrePocoyo<T>::nuevoCorredor(const T& c) {
 	n -> ant = NULL;
 	// si existe ultimo, lo referencio
 	if (ultimo != NULL) {
-		Nodo* corredor = ultimo;
-		n -> sig = corredor;
-		corredor -> ant = n;
+		n -> sig = ultimo;
+		ultimo -> ant = n;
 		ultimo = n;
 	}
 	else {
@@ -234,14 +233,14 @@ void CorrePocoyo<T>::nuevoCorredor(const T& c) {
 
 template<class T>
 void CorrePocoyo<T>::nuevoCorredor(const T& c, const T& a) {
-	/*assert(length > 0);
+	assert(length > 0);
 	Nodo* n = new Nodo();
 	n -> dato = new T(c);
 	//busco al corredor a
 	Nodo* corredor = ultimo;
 	Nodo* sigCorredor = NULL;
 	//cuando encuentro a a, agrego a c adelante
-	while(corredor != primero) {
+	while(corredor != NULL) {
 		if(*(corredor -> dato) == a) {
 			if(corredor == primero) {
 				//referencio a corredor
@@ -266,12 +265,11 @@ void CorrePocoyo<T>::nuevoCorredor(const T& c, const T& a) {
 		corredor = sigCorredor;
 	}
 	length++;
-*/
 }
 
 template<class T>
 void CorrePocoyo<T>::seCansa(const T& c) {
-	if(length == 1)	{
+	if(length == 1 || primero == ultimo)	{
 		delete ultimo -> dato;
 		delete ultimo;
 		length = 0;
@@ -288,29 +286,44 @@ void CorrePocoyo<T>::seCansa(const T& c) {
 			sigCorredor = corredor -> sig;
 			corredor = sigCorredor;
 		}
-		//si es el ultimo
-		if (corredor -> ant == NULL) {
+		//si es el ultimo y es el filmado
+		if (corredor -> ant == NULL && corredor == filmado) {
 			(corredor -> sig) -> ant = NULL; 
+			ultimo = corredor -> sig;
+			filmado = filmado -> sig;
+		//si es el ultimo y no es el filmado
 		}
-		//si es el primero
-		else if (corredor -> sig == NULL) {
+		else if (corredor -> ant == NULL && corredor != filmado) {
+			(corredor -> sig) -> ant = NULL; 
+			ultimo = corredor -> sig;
+		}
+		//si es el primero y es el filmado
+		else if (corredor -> sig == NULL && corredor == filmado) {
 			(corredor -> ant) -> sig = NULL;
+			primero = corredor -> ant;
+			filmado = filmado -> ant;
 		}
-		//si esta en el medio
+		//si es el primero y no es el filmado
+		else if (corredor -> sig == NULL && corredor != filmado) {
+			(corredor -> ant) -> sig = NULL;
+			primero = corredor -> ant;
+		}
+		//si esta en el medio y es el filmado
+		else if (corredor == filmado) {
+			(corredor -> ant) -> sig = corredor -> sig;
+			(corredor -> sig) -> ant = corredor -> ant;
+			filmado = filmado -> ant;
+		}
+		//si esta en el medio y no es el filmado
 		else {
 			(corredor -> ant) -> sig = corredor -> sig;
 			(corredor -> sig) -> ant = corredor -> ant;
-		}
-		if (*(filmado -> dato) == c) {
-			filmado = NULL;
 		}
 		delete corredor -> dato;
 		delete corredor;
 		length--;
 		return;
-
 	}
-
 }
 
 template<class T>
@@ -327,30 +340,44 @@ void CorrePocoyo<T>::sobrepasar(const T& c) {
 	}
 	antCorredor = corredor -> ant;
 	sigCorredor = corredor -> sig;
-	sigsigCorredor = (corredor -> sig) -> sig;
 	//si es el ultimo y es el segundo
-	if (antCorredor == NULL && length == 2) {
-		
+	if (corredor == ultimo && sigCorredor == primero) {
+		ultimo = antCorredor;	
+		primero = corredor;
+		sigCorredor -> ant = antCorredor;
+		sigCorredor -> sig = corredor;
+		corredor -> ant = sigCorredor;
+		corredor -> sig = NULL;	
 	}
 	//si es el ultimo y no es el segundo
-	else if (antCorredor == NULL)  {
+	else if (corredor == ultimo && sigCorredor != primero)  {
+		ultimo = sigCorredor;
+		sigsigCorredor = sigCorredor -> sig;
+		sigCorredor -> ant = antCorredor;
+		sigCorredor -> sig = corredor;
 		sigsigCorredor -> ant = corredor;
-
+		corredor -> ant = sigCorredor;
+		corredor -> sig = sigsigCorredor;
 	}
 	//si no es el ultimo y es el segundo
-	else if (sigsigCorredor == NULL) {
+	else if (corredor != ultimo && sigCorredor == primero) {
+		primero = corredor;
 		antCorredor -> sig = sigCorredor;
+		sigCorredor -> ant = antCorredor;
+		sigCorredor -> sig = corredor;
+		corredor -> ant = sigCorredor;
+		corredor -> sig = NULL;
 	}
-	//si no es el ultimo y es el segundo
-	else {
+	//si no es el ultimo y no es el segundo
+	else if (corredor != ultimo && sigCorredor != primero){
+		sigsigCorredor = sigCorredor -> sig;
 		antCorredor -> sig = sigCorredor;
+		sigCorredor -> ant = antCorredor;
+		sigCorredor -> sig = corredor;
 		sigsigCorredor -> ant = corredor;
+		corredor -> ant = sigCorredor;
+		corredor -> sig = sigsigCorredor;
 	}
-	sigCorredor -> ant = antCorredor;
-	sigCorredor -> sig = corredor;
-	corredor -> ant = sigCorredor;
-	corredor -> sig = sigsigCorredor;	
-
 }
 
 template<class T>

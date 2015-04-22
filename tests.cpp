@@ -31,14 +31,14 @@ void check_agregar_corredores() {
     CorrePocoyo<int> carrera;
 
     carrera.nuevoCorredor(14);
-    //carrera.nuevoCorredor(3,14);
+    carrera.nuevoCorredor(3,14);
     carrera.nuevoCorredor(15);
 
-    //ASSERT(!carrera.esVacia());
+    ASSERT(!carrera.esVacia());
 
-    ASSERT_EQ(to_s(carrera), "[14, 15]");
+    ASSERT_EQ(to_s(carrera), "[3, 14, 15]");
 
-    ASSERT_EQ(carrera.tamanio(), 2);
+    ASSERT_EQ(carrera.tamanio(), 3);
 }
 
 /*
