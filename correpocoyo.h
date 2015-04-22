@@ -96,7 +96,7 @@ class CorrePocoyo{
 	 *
 	 * PRE: Existe al menos esa cantidad de corredores en la carrera
 	 */
-	const T& dameCorredorEnPos(int) const;	
+	const T& dameCorredorEnPos(int i) const;	
 
 
 
@@ -115,7 +115,7 @@ class CorrePocoyo{
 	/*
 	 * Devuelve true si las CorrePocoyos son iguales.
 	 */
-	bool operator==(const CorrePocoyo<T>&) const;	
+	bool operator==(const CorrePocoyo<T>& otro) const;	
 	
 	/*
 	 * Debe mostrar la carrera por el ostream (y retornar el mismo).
@@ -217,47 +217,56 @@ void CorrePocoyo<T>::nuevoCorredor(const T& c) {
 	n -> ant = NULL;
 	// si existe ultimo, lo referencio
 	if (ultimo != NULL) {
-		ultimo -> ant = n;
-		n -> sig = ultimo;
+		Nodo* corredor = ultimo;
+		n -> sig = corredor;
+		corredor -> ant = n;
+		ultimo = n;
 	}
-	else {n -> sig = NULL;}
-	ultimo = n;
-	if(primero == NULL) {primero = n;}
-	if(filmado == NULL) {filmado = n;}
-	length++;
+	else {
+		//como no hay ultimo, tampoco hay primero ni filmado
+		n -> sig = NULL;
+		primero = n;
+		filmado = n;
+		ultimo = n;
+	}	
+	length++;	
 }
 
 template<class T>
 void CorrePocoyo<T>::nuevoCorredor(const T& c, const T& a) {
-	assert(length > 0);
+	/*assert(length > 0);
 	Nodo* n = new Nodo();
 	n -> dato = new T(c);
 	//busco al corredor a
 	Nodo* corredor = ultimo;
 	Nodo* sigCorredor = NULL;
-	while (*(corredor -> dato) != a) {
+	//cuando encuentro a a, agrego a c adelante
+	while(corredor != primero) {
+		if(*(corredor -> dato) == a) {
+			if(corredor == primero) {
+				//referencio a corredor
+				corredor -> sig = n;
+				//referencio a n 
+				n -> sig = NULL;
+				n -> ant = corredor;
+				primero = n;
+			}
+			else {
+				sigCorredor = corredor -> sig;
+				//referencio a sigCorredor
+				sigCorredor -> ant = n;
+				//referencio a corredor
+				corredor -> sig = n;
+				//referencio a n 
+				n -> sig = sigCorredor;
+				n -> ant = corredor;
+			}
+		}
 		sigCorredor = corredor -> sig;
 		corredor = sigCorredor;
 	}
-	if (*(corredor -> dato) == *(primero -> dato)) {
-		//referencio a n 
-		n -> sig = NULL;
-		n -> ant = corredor;
-		//referencio a corredor
-		corredor -> sig = n;
-	}
-	else {
-		sigCorredor = corredor -> sig;
-		//referencio a n 
-		n -> sig = sigCorredor;
-		n -> ant = corredor;
-		//referencio a sigCorredor
-		sigCorredor -> ant = n;
-		//referencio a corredor
-		corredor -> sig = n;
-	}
-	if(*(primero -> dato) == *(corredor -> dato)) {primero = n;}
 	length++;
+*/
 }
 
 template<class T>
@@ -346,24 +355,22 @@ void CorrePocoyo<T>::sobrepasar(const T& c) {
 
 template<class T>
 const T& CorrePocoyo<T>::corredorFilmado() const {
-	return *(filmado -> dato);
-
+		return *(filmado -> dato);
 }
 
 template<class T>
 void CorrePocoyo<T>::filmarProxPerdedor() {
-	filmado = filmado -> ant;
+		filmado = filmado -> ant;
 }
 
 template<class T>
 void CorrePocoyo<T>::filmarProxExitoso() {
-	filmado = filmado -> sig;
-
+		filmado = filmado -> sig;
 }
 
 template<class T>
 const T& CorrePocoyo<T>::damePrimero() const {
-	return *(primero -> dato);
+		return *(primero -> dato);
 }
 
 template<class T>
